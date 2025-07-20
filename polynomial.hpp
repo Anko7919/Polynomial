@@ -61,10 +61,10 @@ namespace dorayaki {
         friend auto operator+(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(Coeff{} + Coeff{})) -> Polynomial<Coeff> {
             Polynomial<Coeff> result; 
             result.coeffs.resize(std::max(lhs.coeffs.size(), rhs.coeffs.size())); 
-            const Polynomial<Coeff> &grater_poly{ (lhs.coeffs.size() < rhs.coeffs.size()) ? (rhs) : (lhs) }; 
-            const Polynomial<Coeff> &less_poly{ (grater_poly == lhs) ? (rhs) : (lhs) }; 
-            for (auto i{ 0uz }; i < grater_poly.coeffs.size(); ++i) {
-                result.coeffs[i] = grater_poly.coeffs[i] + ((less_poly.coeffs.size() <= i) ? (Coeffs{ 0 }) : (less_poly.coeffs[i])); 
+            const Polynomial<Coeff> &greater_poly{ (lhs.coeffs.size() < rhs.coeffs.size()) ? (rhs) : (lhs) }; 
+            const Polynomial<Coeff> &less_poly{ (greater_poly == lhs) ? (rhs) : (lhs) }; 
+            for (auto i{ 0uz }; i < greater_poly.coeffs.size(); ++i) {
+                result.coeffs[i] = greater_poly.coeffs[i] + ((less_poly.coeffs.size() <= i) ? (Coeff{ 0 }) : (less_poly.coeffs[i])); 
             }
             return result; 
         }
