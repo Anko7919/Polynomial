@@ -63,8 +63,9 @@ namespace dorayaki {
             result.coeffs.resize(std::max(lhs.coeffs.size(), rhs.coeffs.size())); 
             const Polynomial<Coeff> &grater_poly{ (lhs.coeffs.size() < rhs.coeffs.size()) ? (rhs) : (lhs) }; 
             const Polynomial<Coeff> &less_poly{ (grater_poly == lhs) ? (rhs) : (lhs) }; 
-            std::transform(std::execution::par, grater_poly.coeffs.cbegin(), grater_poly.coeffs.cend(), less_poly.coeffs.cbegin(), result.coeffs.begin(), 
-                            [](const auto &l, const auto &r){ return l + r; }); 
+            for (auto i{ 0uz }; i < grater_poly.coeffs.size(); ++i) {
+                result.coeffs[i] = grater_poly.coeffs[i] + ((less_poly.coeffs.size() <= i) ? (Coeffs{ 0 }) : (less_poly.coeffs[i])); 
+            }
             return result; 
         }
     }; 
