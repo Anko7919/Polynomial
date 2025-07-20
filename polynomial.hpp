@@ -35,10 +35,37 @@ namespace dorayaki {
 
         auto operator==(const Polynomial<Coeff> &, const Polynomial<Coeff> &) noexcept -> bool = default; 
 
-        auto operator+() const noexcept -> Polynomial<Coeff> {
-            auto ret{ this->coeffs.size() }; 
-            std::transform(std::execution::par, this->coeffs.cbegin(), this->coeffs.cend(), ret.begin(), [](const Coeff &v){ return +v; }); 
-            return ret; 
+        /**
+         * @brief 単項+演算子
+         * coeffsの各要素に+演算子を適用した結果を返す
+         * @return coeffsの各要素に+演算子を適用した結果
+         */
+        auto operator+() const noexcept(noexcept(+Coeff{})) -> Polynomial<Coeff> {
+            Polynomial<Coeff> result; 
+            result.coeffs.resize(this->coeffs.size()); 
+            std::transform(std::execution::par, this->coeffs.cbegin(), this->coeffs.cend(), result.coeffs.begin(), [](const Coeff &v){ return +v; }); 
+            return result; 
+        }
+
+        /**
+         * @brief 単項-演算子
+         * @return coeffsの各要素に-演算子を適用した結果
+         */
+        auto operator-() const noexcept(noexcept(-Coeff{})) -> Polynomial<Coeff> {
+            Polynomial<Coeff> result; 
+            result.coeffs.resize(this->coeffs.size()); 
+            std::transform(std::execution::par, this->coeffs.cbegin(), this->coeffs.cend(), result.coeffs.begin(), [](const Coeff &v){ return -v; }); 
+            return result; 
+        }
+
+        friend auto operator+(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(Coeff{} + Coeff{})) -> Polynomial<Coeff> {
+            Polynomial<Coeff> result; 
+            result.coeffs.resize(std::max(lhs.coeffs.size(), rhs.coeffs.size())); 
+            const Polynomial<Coeff> &grater_poly{ (lhs.coeffs.size() < rhs.coeffs.size()) ? (rhs) : (lhs) }; 
+            const Polynomial<Coeff> &less_poly{ (grater_poly == lhs) ? (rhs) : (lhs) }; 
+            std::transform(std::execution::par, grater_poly.coeffs.cbegin(), grater_poly.coeffs.cend(), less_poly.coeffs.cbegin(), result.coeffs.begin(), 
+                            [](const auto &l, const auto &r){ return l + r; }); 
+            return result; 
         }
     }; 
 } // ! namespace dorayaki
