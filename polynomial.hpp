@@ -33,20 +33,12 @@ namespace dorayaki {
 
         auto trimmed() const noexcept -> Polynomial<Coeff>{
             auto result{ *this }; 
-            for (auto it{ result.coeffs.rbegin() }, end{ result.coeffs.rend() }; it != end - 1; ++it) {
-                if (*it == Coeffs{ 0 }) {
-                    result.coeffs.erase(it); 
-                }
-            }
+            std::erase_if(result, [](auto &v){ return v == Coeff{ 0 }; }); 
             return result; 
         }
 
         auto trim() noexcept -> void {
-            for (auto it{ this->coeffs.rbegin() }, end{ this->coeffs.rend() }; it != end - 1; ++it) {
-                if (*it == Coeffs{ 0 }){
-                    this->coeffs.erase(it); 
-                }
-            }
+            std::erase_if(this->coeffs, [](auto &v){ return v == Coeffs{ 0 }; }); 
         } 
 
         auto operator=(const Polynomial &) -> Polynomial<Coeff> & = default; 
