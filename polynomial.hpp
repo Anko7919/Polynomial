@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace dorayaki {
@@ -30,6 +31,24 @@ namespace dorayaki {
         Polynomial(const Polynomial<Coeff> &) = default; 
         Polynomial(Polynomial<Coeff> &&) = default; 
 
+        auto trimmed() const noexcept -> Polynomial<Coeff>{
+            auto result{ *this }; 
+            for (auto it{ result.coeffs.rbegin() }, end{ result.coeffs.rend() }; it != end - 1; ++it) {
+                if (*it == Coeffs{ 0 }) {
+                    result.coeffs.erase(it); 
+                }
+            }
+            return result; 
+        }
+
+        auto trim() noexcept -> void {
+            for (auto it{ this->coeffs.rbegin() }, end{ this->coeffs.rend() }; it != end - 1; ++it) {
+                if (*it == Coeffs{ 0 }){
+                    this->coeffs.erase(it); 
+                }
+            }
+        } 
+
         auto operator=(const Polynomial &) -> Polynomial<Coeff> & = default; 
         auto operator=(Polynomial &&) -> Polynomial<Coeff> & = default; 
 
@@ -40,7 +59,7 @@ namespace dorayaki {
          * coeffsの各要素に+演算子を適用した結果を返す
          * @return coeffsの各要素に+演算子を適用した結果
          */
-        auto operator+() const noexcept(noexcept(+Coeff{})) -> Polynomial<Coeff> {
+        auto operator+() const noexcept(noexcept(+std::declval<Coeff>())) -> Polynomial<Coeff> {
             Polynomial<Coeff> result; 
             result.coeffs.resize(this->coeffs.size()); 
             std::transform(std::execution::par, this->coeffs.cbegin(), this->coeffs.cend(), result.coeffs.begin(), [](const Coeff &v){ return +v; }); 
@@ -51,14 +70,14 @@ namespace dorayaki {
          * @brief 単項-演算子
          * @return coeffsの各要素に-演算子を適用した結果
          */
-        auto operator-() const noexcept(noexcept(-Coeff{})) -> Polynomial<Coeff> {
+        auto operator-() const noexcept(noexcept(-std::declval<Coeff>())) -> Polynomial<Coeff> {
             Polynomial<Coeff> result; 
             result.coeffs.resize(this->coeffs.size()); 
             std::transform(std::execution::par, this->coeffs.cbegin(), this->coeffs.cend(), result.coeffs.begin(), [](const Coeff &v){ return -v; }); 
             return result; 
         }
 
-        friend auto operator+(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(Coeff{} + Coeff{})) -> Polynomial<Coeff> {
+        friend auto operator+(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(std::declval<Coeff>() + std::declval<Coeff>())) -> Polynomial<Coeff> {
             Polynomial<Coeff> result; 
             result.coeffs.resize(std::max(lhs.coeffs.size(), rhs.coeffs.size())); 
             const Polynomial<Coeff> &greater_poly{ (lhs.coeffs.size() < rhs.coeffs.size()) ? (rhs) : (lhs) }; 
@@ -69,7 +88,7 @@ namespace dorayaki {
             return result; 
         }
 
-        friend auto operator-(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(Coeff{} - Coeff())) -> Polynomial<Coeff> {
+        friend auto operator-(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(std::declval<Coeff>() - std::declval<Coeff>())) -> Polynomial<Coeff> {
             Polynomial<Coeff> result; 
             result.coeffs.resize(std::max(lhs.coeffs.size(), rhs.coeffs.size())); 
             const Polynomial<Coeff> &greater_poly{ (lhs.coeffs.size() < rhs.coeffs.size()) ? (rhs) : (lhs) }; 
@@ -78,6 +97,16 @@ namespace dorayaki {
                 result.coeffs[i] = greater_poly.coeffs[i] - ((less_poly.coeffs.size() <= i) ? (Coeff{ 0 }) : (less_poly.coeffs[i])); 
             }
             return result; 
+        }
+
+        friend auto operator*(const Polynomial<Coeff> &lhs, const Polynomial<Coeff> &rhs) noexcept(noexcept(Coeff{} * Coeff{})) -> Polynomial<Coeff>{
+            Polynomial<Coeff> result; 
+            result.coeffs.resize(lhs.size() * rhs.size()); 
+            return result; 
+        }
+
+        friend auto operator<<(std::ostream &os, const Polynomial<Coeff> &poly) noexcept(noexcept(std::declval<std::ostream &>() << std::declval<Coeff>())) -> std::ostream & {
+            return os; 
         }
     }; 
 } // ! namespace dorayaki
