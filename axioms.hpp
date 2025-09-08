@@ -63,6 +63,15 @@ namespace dorayaki {
 
     template <typename T>
     concept oneable = has_one<T>::value; 
+
+    /* 代数系の公理 */
+    // Ring
+    template <typename T>
+    concept calcable_as_ring = addable<T> && subtractable<T> && multipliable<T> && negatable<T> && zeroable<T> && oneable<T>; 
+
+    // Field
+    template <typename T>
+    concept calcable_as_field = calcable_as_ring<T> && divisible<T>; 
 }
 
 #endif // ! DORAYAKI_AXIOMS_HPP_INCLUDED
