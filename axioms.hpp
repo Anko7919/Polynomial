@@ -42,7 +42,7 @@ namespace dorayaki {
     template <typename T>
     struct has_zero : public std::false_type {}; 
 
-    template <typename T> requires std::is_arithmetic<T>
+    template <typename T> requires std::is_arithmetic_v<T>
     struct has_zero<T> : public std::true_type {}; 
 
     template <typename T>
@@ -55,7 +55,7 @@ namespace dorayaki {
     template <typename T>
     struct has_one : public std::false_type {};
 
-    template <typename T> requires std::is_arithmetic<T>
+    template <typename T> requires std::is_arithmetic_v<T>
     struct has_one<T> : public std::true_type {}; 
 
     template <typename T>
